@@ -1,0 +1,11 @@
+{
+    "name": "ArMedia",
+    "alias": "armedia",
+    "description": "",
+    "keywords": [],
+    "priority": 0,
+    "providers": [
+        "Modules\\ArMedia\\Providers\\ArMediaServiceProvider"
+    ],
+    "files": []
+}

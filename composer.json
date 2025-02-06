@@ -1,0 +1,30 @@
+{
+    "name": "nwidart/armedia",
+    "description": "",
+    "authors": [
+        {
+            "name": "Nicolas Widart",
+            "email": "n.widart@gmail.com"
+        }
+    ],
+    "extra": {
+        "laravel": {
+            "providers": [],
+            "aliases": {
+
+            }
+        }
+    },
+    "autoload": {
+        "psr-4": {
+            "Modules\\ArMedia\\": "app/",
+            "Modules\\ArMedia\\Database\\Factories\\": "database/factories/",
+            "Modules\\ArMedia\\Database\\Seeders\\": "database/seeders/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Modules\\ArMedia\\Tests\\": "tests/"
+        }
+    }
+}
