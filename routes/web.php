@@ -16,4 +16,5 @@ use Modules\ArMedia\Http\Controllers\ArMediaController;
 
 Route::group([], function () {
     Route::resource('armedia', ArMediaController::class)->names('armedia');
+    Route::get('/armedia/items', [ArmediaController::class, 'getItems'])->name('armedia.getItems');
 });
