@@ -114,6 +114,17 @@
             padding: 5px;
             cursor: pointer;
         }
+
+        .delete-image {
+            display: block;
+            width: 100%;
+            margin-top: 5px;
+            background-color: #ff002b;
+            color: white;
+            border: none;
+            padding: 5px;
+            cursor: pointer;
+        }
     </style>
 </head>
 

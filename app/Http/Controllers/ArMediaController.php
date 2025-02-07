@@ -131,36 +131,38 @@ class ArMediaController extends Controller
         if ($media) {
             $filePath = $media->path;
             // بررسی وجود فایل
+
             if (File::exists($filePath)) {
                 // حذف فایل
+
                 File::delete($filePath);
             }
 
             // حذف رکورد از دیتابیس
             $media->delete();
-            return back()->with('success', __('تصویر با موفقیت حذف شد.'));
+            return response()->json(['message' => 'Media deleted successfully.']);
         }
     }
-    public function handleSelection(Request $request)
-    {
-        $selectedImages = $request->input('selected_images'); // لیست ID‌های انتخاب‌شده
-        $ids = explode(',', $selectedImages);
-        $user = User::findOrFail(Auth::id());
-        $image = Armedia::findOrFail($ids)->first();
+    // public function handleSelection(Request $request)
+    // {
+    //     $selectedImages = $request->input('selected_images'); // لیست ID‌های انتخاب‌شده
+    //     $ids = explode(',', $selectedImages);
+    //     $user = User::findOrFail(Auth::id());
+    //     $image = Armedia::findOrFail($ids)->first();
 
-        $image->update([
-            'related_type' => 'profile', // تعیین اینکه این تصویر مربوط به پروفایل است
-            'user_id' => $user->id, // مرتبط کردن تصویر با کاربر جاری
-        ]);
+    //     $image->update([
+    //         'related_type' => 'profile', // تعیین اینکه این تصویر مربوط به پروفایل است
+    //         'user_id' => $user->id, // مرتبط کردن تصویر با کاربر جاری
+    //     ]);
 
-        $user->update([
-            'profile_photo_path' => $image->path,
-        ]);
+    //     $user->update([
+    //         'profile_photo_path' => $image->path,
+    //     ]);
 
 
-        // انجام عملیات بر اساس نیاز
-        return redirect()->route('dashboard')->with('success', 'Images selected successfully.');
-    }
+    //     // انجام عملیات بر اساس نیاز
+    //     return redirect()->route('dashboard')->with('success', 'Images selected successfully.');
+    // }
 
     public function getItems(Request $request)
     {

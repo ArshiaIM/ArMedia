@@ -6,7 +6,7 @@
 @section('content')
     <div class="upload-container">
         <h2>آپلود تصویر</h2>
-        <form action="{{route('armedia.store')}}" method="POST" enctype="multipart/form-data">
+        <form action="{{ route('armedia.store') }}" method="POST" enctype="multipart/form-data">
             @csrf
             <input type="file" id="imageUpload" name="image" accept="image/*" multiple>
             <button id="uploadBtn" class="upload-btn">آپلود</button>
@@ -18,8 +18,10 @@
             <div class="image-list">
                 @foreach ($images as $image)
                     <div class="image-item">
-                        <img src="{{ asset( $image->path) }}" data-id="{{ $image->id }}">
+
+                        <img src="{{ asset($image->path) }}" data-id="{{ $image->id }}">
                         <button class="select-image" data-id="{{ $image->id }}">انتخاب</button>
+                        <button class="delete-image" data-id="{{ $image->id }}">حذف</button>
                     </div>
                 @endforeach
             </div>
@@ -77,5 +79,30 @@
 
             input.files = dt.files;
         }
+
+        document.querySelectorAll('.delete-image').forEach(button => {
+            button.addEventListener('click', function() {
+                let imageId = this.getAttribute('data-id');
+
+                if (!confirm("آیا از حذف این تصویر مطمئن هستید؟")) return;
+
+                fetch("{{ route('armedia.destroy', '') }}/" + imageId, {
+                        method: "DELETE",
+                        headers: {
+                            "X-CSRF-TOKEN": "{{ csrf_token() }}",
+                            "X-Requested-With": "XMLHttpRequest"
+                        }
+                    })
+                    .then(response => response.json())
+                    .then(data => {
+                        console.log(data);
+                        if (data.message) {
+                            alert(data.message);
+                            this.parentElement.remove(); // حذف از صفحه
+                        }
+                    })
+                    .catch(error => console.error("Error:", error));
+            });
+        });
     </script>
 @endsection
