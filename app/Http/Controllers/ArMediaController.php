@@ -8,6 +8,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\File;
 use Modules\ArMedia\Models\Armedia;
+use Str;
 
 class ArMediaController extends Controller
 {
@@ -16,7 +17,8 @@ class ArMediaController extends Controller
      */
     public function index()
     {
-        return view('armedia::index');
+        $images = Armedia::where('user_id', '=', Auth::id())->get();
+        return view('armedia::index', compact('images'));
     }
 
     /**
@@ -33,13 +35,15 @@ class ArMediaController extends Controller
     public function store(Request $request)
     {
 
+        // dd($request->all());
+
         $request->validate([
             'image' => 'required|image|max:2048', // حداکثر 2 مگابایت
         ]);
 
         $userId = Auth::id();
         $image = $request->file('image');
-        $folder = "armedia/$userId/profile"; // مسیر ذخیره
+        $folder = "armedia/$userId/unset"; // مسیر ذخیره
         $filename = time() . '_' . $image->getClientOriginalName();
 
         $path = $image->storeAs($folder, $filename, 'public');
@@ -47,12 +51,14 @@ class ArMediaController extends Controller
         Armedia::create([
             'user_id' => $userId,
             'filename' => $filename,
-            'path' => $path,
+            'path' => 'storage/' . $path,
             'type' => $image->getMimeType(),
+            'related_type' => 'unset',
+
             'size' => $image->getSize(),
         ]);
 
-        return back()->with('success', 'Image uploaded successfully.');
+        return redirect()->route('armedia.index')->with('success', 'Image uploaded successfully.');
     }
 
     /**
@@ -60,7 +66,8 @@ class ArMediaController extends Controller
      */
     public function show($id)
     {
-        return view('armedia::show');
+        $image = Armedia::findOrFail($id);
+        return view('armedia::show', compact('image'));
     }
 
     /**
@@ -77,28 +84,42 @@ class ArMediaController extends Controller
      */
     public function update(Request $request, $id)
     {
+
+
+        $request->validate([
+            'related_type' => 'required|string',
+            'related_id' => 'nullable|integer',
+        ]);
+        $related_type = $request->related_type;
+
+        if ($related_type != 'profile') {
+            $related_id = $request->related_id;
+            $related_id = $request->related_id;
+            $newPath = 'storage/armedia/' .  Auth::id() . '/' . $related_type . '/' . $related_id . '/';
+        }
+        $newPath = 'storage/armedia/' . Auth::id() . '/' . $related_type . '/';
+
+
         $media = Armedia::findOrFail($id);
         $oldPath = $media->path;
-        $newPath = 'armedia/'.Auth::id().'/'.$request->related_type.'/';
 
-        if($oldPath){
+        if ($oldPath) {
 
             if (!File::exists(public_path($newPath))) {
 
                 File::makeDirectory(public_path($newPath), 0755, true);
             }
-            $newPath = 'armedia/'.Auth::id().'/'.$request->related_type.'/'.$media->filename;
-            if(File::move($oldPath,$newPath)){
+            $newPath .= $media->filename;
+            if (File::move($oldPath, $newPath)) {
                 $media->update([
-                    'related_type'=>$request->related_type,
-                    'related_id'=>$request->related_id ?? Auth::id(),
-                    'path'=>$newPath,
+                    'related_type' => $related_type,
+                    'related_id' => $request->related_id,
+                    'path' => $newPath,
                 ]);
             }
-
         }
 
-        return redirect()->route('armedia')->with('success', 'Media updated successfully!');
+        return redirect()->route('armedia.index')->with('success', 'Media updated successfully!');
     }
 
     /**
@@ -141,4 +162,32 @@ class ArMediaController extends Controller
         return redirect()->route('dashboard')->with('success', 'Images selected successfully.');
     }
 
+    public function getItems(Request $request)
+    {
+        $type = $request->query('type');
+
+        // لیست مدل‌های مجاز
+        $models = [
+            // 'profile' => \App\Models\Users::class,
+            // 'post'    => \App\Models\Post::class,
+            // 'product' => \App\Models\Product::class,
+            // 'banner'  => \App\Models\Banner::class,
+        ];
+
+        if (!array_key_exists($type, $models)) {
+            return response()->json(['error' => 'Invalid type'], 400);
+        }
+
+        if ($type == 'profile') {
+            $items = [];
+            return response()->json($items);
+        } else {
+            // دریافت داده‌ها با استفاده از مدل
+            $items = $models[$type]::all();
+        }
+
+
+
+        return response()->json($items);
+    }
 }

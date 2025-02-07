@@ -13,7 +13,7 @@ class Armedia extends Model
     /**
      * The attributes that are mass assignable.
      */
-    protected $fillable = [];
+    protected $fillable = ['user_id','path','filename','type','size','related_type','related_id'];
 
     // protected static function newFactory(): ArmediaFactory
     // {
