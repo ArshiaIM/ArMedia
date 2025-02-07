@@ -9,7 +9,7 @@
 - [PHP](https://www.php.net/) نسخه 7.4 یا بالاتر
 - [Composer](https://getcomposer.org/)
 - [Laravel](https://laravel.com/) نسخه 8 یا بالاتر
-- [nwidart] (nwidart.com/) پیش از استفاده از ماژول حتما nwidart رو نصب و تنظیمات اون رو کامل کنید.
+- [nwidart](https://nwidart.com/)پیش از استفاده از ماژول حتما nwidart رو نصب و تنظیمات اون رو کامل کنید.
 
 ## نصب ماژول
 
