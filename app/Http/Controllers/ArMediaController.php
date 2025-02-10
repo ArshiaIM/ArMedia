@@ -17,6 +17,7 @@ class ArMediaController extends Controller
      */
     public function index()
     {
+        // dd(Armedia::getImageFor('product', 1));
         $images = Armedia::where('user_id', '=', Auth::id())->get();
         return view('armedia::index', compact('images'));
     }
@@ -90,18 +91,18 @@ class ArMediaController extends Controller
             'related_type' => 'required|string',
             'related_id' => 'nullable|integer',
         ]);
-        $related_type = $request->related_type;
-
-        if ($related_type != 'profile') {
-            $related_id = $request->related_id;
-            $related_id = $request->related_id;
-            $newPath = 'storage/armedia/' .  Auth::id() . '/' . $related_type . '/' . $related_id . '/';
-        }
-        $newPath = 'storage/armedia/' . Auth::id() . '/' . $related_type . '/';
-
 
         $media = Armedia::findOrFail($id);
+
         $oldPath = $media->path;
+        $related_type = $request->related_type;
+        $related_id   = Auth::id();
+        $newPath = 'storage/armedia/' . Auth::id() . '/' . $related_type . '/';
+
+        if ($related_type != 'profile') {
+            $related_id =  $request->related_id;
+            $newPath = 'storage/armedia/' .  Auth::id() . '/' . $related_type . '/' . $related_id . '/';
+        }
 
         if ($oldPath) {
 
@@ -113,7 +114,7 @@ class ArMediaController extends Controller
             if (File::move($oldPath, $newPath)) {
                 $media->update([
                     'related_type' => $related_type,
-                    'related_id' => $request->related_id,
+                    'related_id' => $related_id,
                     'path' => $newPath,
                 ]);
             }
@@ -164,17 +165,12 @@ class ArMediaController extends Controller
     //     return redirect()->route('dashboard')->with('success', 'Images selected successfully.');
     // }
 
-    public function getItems(Request $request)
+    public function getItems($selectedType)
     {
-        $type = $request->query('type');
+        $type = $selectedType;
 
         // لیست مدل‌های مجاز
-        $models = [
-            // 'profile' => \App\Models\Users::class,
-            // 'post'    => \App\Models\Post::class,
-            // 'product' => \App\Models\Product::class,
-            // 'banner'  => \App\Models\Banner::class,
-        ];
+        $models = Armedia::$models;
 
         if (!array_key_exists($type, $models)) {
             return response()->json(['error' => 'Invalid type'], 400);

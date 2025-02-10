@@ -28,7 +28,7 @@
             document.getElementById('related_type').addEventListener('change', function() {
                 let selectedType = this.value;
 
-                fetch("{{ route('armedia.getItems') }}?type=" + selectedType, {
+                fetch("{{ route('armedia.getItems') }}/" + selectedType, {
                         method: "GET",
                         headers: {
                             "X-Requested-With": "XMLHttpRequest"
